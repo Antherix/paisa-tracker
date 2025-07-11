@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paisa Tracker - Gamified Money Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .app-title {
+            font-size: 2.5em;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+        }
+
+        .level-display {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .level-text {
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        .balance-card {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .balance-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1);
+        }
+
+        .balance-amount {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .balance-text {
+            font-size: 1.1em;
+            color: #666;
+            font-style: italic;
+            margin-bottom: 15px;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .action-btn {
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transition: all 0.3s ease;
+            transform: translate(-50%, -50%);
+        }
+
+        .action-btn:hover::before {
+            width: 100%;
+            height: 100%;
+        }
+
+        .btn-got-money {
+            background: linear-gradient(135deg, #4CAF50, #8BC34A);
+            color: white;
+        }
+
+        .btn-spent-smart {
+            background: linear-gradient(135deg, #2196F3, #21CBF3);
+            color: white;
+        }
+
+        .btn-saved {
+            background: linear-gradient(135deg, #FF9800, #FFC107);
+            color: white;
+        }
+
+        .btn-wasted {
+            background: linear-gradient(135deg, #F44336, #FF5722);
+            color: white;
+        }
+
+        .transaction-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .transaction-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .feedback-message {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-left: 5px solid #667eea;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .bounce {
+            animation: bounce 1s;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .transaction-history {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .transaction-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-emoji {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+
+        .no-money-section {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .no-money-text {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .advice-section {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            color: white;
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .advice-text {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="app-title">💰 Paisa Tracker</h1>
+        </div>
+
+        <div class="level-display">
+            <div class="level-text">Level <span id="levelNumber">1</span> - <span id="levelTitle">Pocket Money Pro</span></div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+            <div style="color: white; font-size: 0.9em;">
+                <span id="currentPoints">0</span> / <span id="nextLevelPoints">100</span> points
+            </div>
+        </div>
+
+        <div class="balance-card" id="balanceCard">
+            <div class="balance-amount">₹<span id="balanceAmount">0</span></div>
+            <div class="balance-text" id="balanceText">Aukat ₹0 ki hai… but dreams toh ₹10 Cr wale hain.</div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="action-btn btn-got-money" onclick="showTransactionForm('got-money')">
+                💰 Got Money
+            </button>
+            <button class="action-btn btn-spent-smart" onclick="showTransactionForm('spent-smart')">
+                💡 Spent Smart
+            </button>
+            <button class="action-btn btn-saved" onclick="showTransactionForm('saved')">
+                💪 Saved Money
+            </button>
+            <button class="action-btn btn-wasted" onclick="showTransactionForm('wasted')">
+                💩 Wasted Money
+            </button>
+        </div>
+
+        <div class="transaction-card hidden" id="transactionForm">
+            <div class="transaction-title" id="transactionTitle">Add Transaction</div>
+            <div class="input-group">
+                <label for="amountInput">Amount (₹)</label>
+                <input type="number" id="amountInput" placeholder="Enter amount" min="1">
+            </div>
+            <div class="input-group">
+                <label for="descriptionInput">Description</label>
+                <input type="text" id="descriptionInput" placeholder="What was it for?">
+            </div>
+            <button class="submit-btn" onclick="submitTransaction()">Submit</button>
+        </div>
+
+        <div class="feedback-message hidden" id="feedbackMessage"></div>
+
+        <div class="transaction-history" id="transactionHistory">
+            <h3 style="margin-bottom: 15px; color: #2c3e50;">Recent Transactions</h3>
+            <div id="transactionList">
+                <div style="text-align: center; color: #666; padding: 20px;">
+                    No transactions yet. Start tracking your money!
+                </div>
+            </div>
+        </div>
+
+        <div class="advice-section" id="adviceSection">
+            <div class="advice-text" id="adviceText">Papa ki daant se bachna hai? Toh save karna seekh.</div>
+        </div>
+    </div>
+
+    <script>
+        let balance = 0;
+        let points = 0;
+        let level = 1;
+        let transactions = [];
+        let currentTransactionType = '';
+
+        const levels = [
+            { level: 1, title: "Pocket Money Pro", pointsNeeded: 100 },
+            { level: 2, title: "Budget Badshah", pointsNeeded: 250 },
+            { level: 3, title: "Savings Sultan", pointsNeeded: 500 },
+            { level: 4, title: "Money Master", pointsNeeded: 1000 },
+            { level: 5, title: "Financial Fauji", pointsNeeded: 2000 }
+        ];
+
+        const balanceTexts = [
+            "Aukat ₹{balance} ki hai… but dreams toh ₹10 Cr wale hain.",
+            "Bhai, itna paisa? Richie Rich ka chhota bhai lag raha!",
+            "Abey oye! You still have ₹{balance}? Paisa sambhaal ke rakh bhai, weekend aaraha hai!",
+            "Mood: Ballin' on a budget 💸",
+            "Bank balance is directly proportional to your self-respect… currently at {balance}%. 😤"
+        ];
+
+        const feedbackMessages = {
+            'got-money': [
+                "Kya baat hai! Aaj toh paisa baras gaya!",
+                "Maa kasam, paisa dekh ke aankhon mein aasu aa gaye.",
+                "Dhan Ayo! Dhan Ayo! 🕺",
+                "Income mila? Chal chai treat de!"
+            ],
+            'saved': [
+                "Zindagi ne mauka diya aur tu ne bacha liya 💪",
+                "Be like you. Smart. Sexy. Saver.",
+                "Aaj khud pe proud feel ho raha hoga, na?",
+                "Warren Buffet bhi tera fan ho gaya 🔥"
+            ],
+            'spent-smart': [
+                "Dimag lagaya, paisa bachaya 💼",
+                "Invest kiya? Ya treat di? Either way… smart move.",
+                "Legend move detected. 🧠💸",
+                "Karcha hua, par mann ko shanti mili."
+            ],
+            'wasted': [
+                "Bhai kya hi ukhaad liya ₹{amount} uda ke?",
+                "'Bas ek baar try karte hain' – Famous last words.",
+                "Aur paisa gaya... Tere sath bhi hota hai kya aisa?",
+                "Congratulations, you just donated to stupidity."
+            ]
+        };
+
+        const adviceTexts = [
+            "Papa ki daant se bachna hai? Toh save karna seekh.",
+            "Aaj bacha le paisa, kal tujhe chahiye hoga.",
+            "Bhai paisa kamaana art hai, sambhalna science.",
+            "Jitna jalegi aaj, utna chamkoge kal 💡",
+            "Retail therapy hits different when you're broke.",
+            "Kharche kiya, guilt bhi aya.",
+            "'Needed' tha ya 'wanted'? Socho."
+        ];
+
+        const noMoneyTexts = [
+            "Ab toh app bhi ro raha hai tere sath…",
+            "Khaali wallet, full depression.",
+            "Netflix ka renewal bhi luxury lag raha 😩",
+            "Bhai UPI ka sound bhool gaye kya?"
+        ];
+
+        function showTransactionForm(type) {
+            currentTransactionType = type;
+            const form = document.getElementById('transactionForm');
+            const title = document.getElementById('transactionTitle');
+            
+            const titles = {
+                'got-money': '💰 Got Money',
+                'spent-smart': '💡 Spent Smart',
+                'saved': '💪 Saved Money',
+                'wasted': '💩 Wasted Money'
+            };
+            
+            title.textContent = titles[type];
+            form.classList.remove('hidden');
+            
+            // Clear previous inputs
+            document.getElementById('amountInput').value = '';
+            document.getElementById('descriptionInput').value = '';
+        }
+
+        function submitTransaction() {
+            const amount = parseFloat(document.getElementById('amountInput').value);
+            const description = document.getElementById('descriptionInput').value;
+            
+            if (!amount || amount <= 0) {
+                alert('Please enter a valid amount!');
+                return;
+            }
+            
+            if (!description.trim()) {
+                alert('Please enter a description!');
+                return;
+            }
+            
+            processTransaction(currentTransactionType, amount, description);
+            
+            // Hide form
+            document.getElementById('transactionForm').classList.add('hidden');
+        }
+
+        function processTransaction(type, amount, description) {
+            let pointsEarned = 0;
+            let emoji = '';
+            
+            // Process based on transaction type
+            switch(type) {
+                case 'got-money':
+                    balance += amount;
+                    pointsEarned = Math.floor(amount / 10);
+                    emoji = '💰';
+                    break;
+                case 'saved':
+                    pointsEarned = Math.floor(amount / 5) + 20; // Extra points for saving
+                    emoji = '💪';
+                    break;
+                case 'spent-smart':
+                    balance -= amount;
+                    pointsEarned = Math.floor(amount / 10) + 10; // Smart spending gets bonus
+                    emoji = '💡';
+                    break;
+                case 'wasted':
+                    balance -= amount;
+                    pointsEarned = -Math.floor(amount / 5); // Lose points for wasting
+                    emoji = '💩';
+                    break;
+            }
+            
+            // Update points
+            points += pointsEarned;
+            if (points < 0) points = 0;
+            
+            // Add to transaction history
+            transactions.unshift({
+                type: type,
+                amount: amount,
+                description: description,
+                points: pointsEarned,
+                emoji: emoji,
+                timestamp: new Date().toLocaleString()
+            });
+            
+            // Update UI
+            updateBalance();
+            updateLevel();
+            showFeedback(type, amount);
+            updateTransactionHistory();
+            updateAdvice();
+            
+            // Keep only last 10 transactions
+            if (transactions.length > 10) {
+                transactions = transactions.slice(0, 10);
+            }
+        }
+
+        function updateBalance() {
+            document.getElementById('balanceAmount').textContent = balance;
+            
+            // Update balance text
+            let balanceText = balanceTexts[Math.floor(Math.random() * balanceTexts.length)];
+            balanceText = balanceText.replace('{balance}', balance);
+            document.getElementById('balanceText').textContent = balanceText;
+            
+            // Show no money section if balance is 0 or negative
+            if (balance <= 0) {
+                showNoMoneySection();
+            }
+            
+            // Add bounce animation
+            document.getElementById('balanceCard').classList.add('bounce');
+            setTimeout(() => {
+                document.getElementById('balanceCard').classList.remove('bounce');
+            }, 1000);
+        }
+
+        function updateLevel() {
+            const currentLevel = levels.find(l => l.level === level);
+            const nextLevel = levels.find(l => l.level === level + 1);
+            
+            if (nextLevel && points >= nextLevel.pointsNeeded) {
+                level++;
+                showLevelUp();
+            }
+            
+            // Update level display
+            document.getElementById('levelNumber').textContent = level;
+            document.getElementById('levelTitle').textContent = levels[level - 1].title;
+            document.getElementById('currentPoints').textContent = points;
+            
+            if (nextLevel) {
+                document.getElementById('nextLevelPoints').textContent = nextLevel.pointsNeeded;
+                const progressPercentage = (points / nextLevel.pointsNeeded) * 100;
+                document.getElementById('progressFill').style.width = Math.min(progressPercentage, 100) + '%';
+            } else {
+                document.getElementById('nextLevelPoints').textContent = '∞';
+                document.getElementById('progressFill').style.width = '100%';
+            }
+        }
+
+        function showLevelUp() {
+            const feedbackDiv = document.getElementById('feedbackMessage');
+            feedbackDiv.innerHTML = `🎉 LEVEL UP! 🎉<br>Welcome to Level ${level}: ${levels[level - 1].title}!`;
+            feedbackDiv.style.background = 'linear-gradient(135deg, #4CAF50, #8BC34A)';
+            feedbackDiv.style.color = 'white';
+            feedbackDiv.classList.remove('hidden');
+            feedbackDiv.classList.add('pulse');
+            
+            setTimeout(() => {
+                feedbackDiv.classList.add('hidden');
+                feedbackDiv.classList.remove('pulse');
+            }, 3000);
+        }
+
+        function showFeedback(type, amount) {
+            const feedbackDiv = document.getElementById('feedbackMessage');
+            const messages = feedbackMessages[type];
+            let message = messages[Math.floor(Math.random() * messages.length)];
+            message = message.replace('{amount}', amount);
+            
+            feedbackDiv.textContent = message;
+            feedbackDiv.style.background = '#f8f9fa';
+            feedbackDiv.style.color = '#333';
+            feedbackDiv.classList.remove('hidden');
+            
+            setTimeout(() => {
+                feedbackDiv.classList.add('hidden');
+            }, 3000);
+        }
+
+        function updateTransactionHistory() {
+            const listDiv = document.getElementById('transactionList');
+            
+            if (transactions.length === 0) {
+                listDiv.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">No transactions yet. Start tracking your money!</div>';
+                return;
+            }
+            
+            listDiv.innerHTML = '';
+            
+            transactions.forEach(transaction => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'transaction-item';
+                
+                const leftDiv = document.createElement('div');
+                leftDiv.innerHTML = `
+                    <span class="transaction-emoji">${transaction.emoji}</span>
+                    <strong>${transaction.description}</strong><br>
+                    <small style="color: #666;">${transaction.timestamp}</small>
+                `;
+                
+                const rightDiv = document.createElement('div');
+                rightDiv.style.textAlign = 'right';
+                rightDiv.innerHTML = `
+                    <div style="font-weight: bold; color: ${transaction.type === 'got-money' ? '#4CAF50' : transaction.type === 'wasted' ? '#F44336' : '#2196F3'};">
+                        ${transaction.type === 'got-money' ? '+' : transaction.type === 'saved' ? '' : '-'}₹${transaction.amount}
+                    </div>
+                    <div style="font-size: 0.9em; color: ${transaction.points >= 0 ? '#4CAF50' : '#F44336'};">
+                        ${transaction.points >= 0 ? '+' : ''}${transaction.points} points
+                    </div>
+                `;
+                
+                itemDiv.appendChild(leftDiv);
+                itemDiv.appendChild(rightDiv);
+                listDiv.appendChild(itemDiv);
+            });
+        }
+
+        function updateAdvice() {
+            const adviceDiv = document.getElementById('adviceText');
+            const randomAdvice = adviceTexts[Math.floor(Math.random() * adviceTexts.length)];
+            adviceDiv.textContent = randomAdvice;
+        }
+
+        function showNoMoneySection() {
+            const balanceCard = document.getElementById('balanceCard');
+            balanceCard.classList.add('no-money-section');
+            balanceCard.style.background = 'linear-gradient(135deg, #ff6b6b, #ee5a52)';
+            balanceCard.style.color = 'white';
+            
+            const noMoneyText = noMoneyTexts[Math.floor(Math.random() * noMoneyTexts.length)];
+            document.getElementById('balanceText').textContent = noMoneyText;
+            
+            setTimeout(() => {
+                balanceCard.classList.remove('no-money-section');
+                balanceCard.style.background = 'white';
+                balanceCard.style.color = '#333';
+            }, 5000);
+        }
+
+        // Initialize app
+        updateBalance();
+        updateLevel();
+        updateAdvice();
+        
+        // Change advice every 10 seconds
+        setInterval(updateAdvice, 10000);
+    </script>
+</body>
+</html>
